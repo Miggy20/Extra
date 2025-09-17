@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>TKM</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+      cursor: pointer;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .floating-text {
+      position: absolute;
+      color: white;
+      font-size: 28px;
+      text-shadow: 0 0 10px #fff, 0 0 20px #ff00ff, 0 0 30px #ff00ff; 
+      opacity: 1;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      animation: floatUp 3s ease-out forwards;
+    }
+
+    @keyframes floatUp {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) translateY(0);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) translateY(-100px);
+      }
+    }
+
+    .start-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 32px;
+      text-shadow: 0 0 10px #fff, 0 0 20px #f0f, 0 0 40px #0ff;
+      animation: blink 1.5s infinite alternate;
+      text-align: center;
+    }
+
+    @keyframes blink {
+      from { opacity: 1; }
+      to { opacity: 0.5; }
+    }
+
+    /* Nyan Cat volando */
+    #nyanCat {
+      position: absolute;
+      width: 100px;
+      top: 50%;       
+      left: -150px;   
+      z-index: 1;
+      animation: fly 15s linear infinite;
+    }
+
+    @keyframes fly {
+      0% { left: -150px; }
+      100% { left: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="stars"></canvas>
+  <div id="startText" class="start-text">Hola chicas✨</div>
+
+  <!-- GIF de Nyan Cat -->
+  <img id="nyanCat" src="nyan-cat.gif" alt="Nyan Cat">
+
+  <script>
+    // ⭐ Fondo de estrellas animadas
+    const canvas = document.getElementById('stars');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function createStars() {
+      stars = [];
+      for (let i = 0; i < 150; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 1.5,
+          speed: Math.random() * 0.3
+        });
+      }
+    }
+    createStars();
+
+    function drawStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "white";
+      stars.forEach(star => {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fill();
+        star.y += star.speed;
+        if (star.y > canvas.height) star.y = 0;
+      });
+      requestAnimationFrame(drawStars);
+    }
+    drawStars();
+
+    // 🔹 Lista de frases personalizadas
+    const basePhrases = [
+      'Muy pronto iremos a comer esos heladitos que le debemos🤗🍨',
+      'Tenga paciencia chicas😅',
+    ];
+
+    const startText = document.getElementById('startText');
+    let started = false;
+
+    let phraseIndex = 0; // índice para recorrer las frases
+
+    document.addEventListener('click', (e) => {
+      if (!started) {
+        started = true;
+        startText.style.display = 'none';
+      }
+
+      // Tomar la frase en orden
+      const phrase = basePhrases[phraseIndex];
+      phraseIndex = (phraseIndex + 1) % basePhrases.length; // volver al inicio cuando termine
+
+      const text = document.createElement('div');
+      text.className = 'floating-text';
+      text.innerText = phrase;
+      text.style.left = `${e.clientX}px`;
+      text.style.top = `${e.clientY}px`;
+
+      document.body.appendChild(text);
+
+      setTimeout(() => text.remove(), 3000);
+    });
+  </script>
+</body>
+</html>
